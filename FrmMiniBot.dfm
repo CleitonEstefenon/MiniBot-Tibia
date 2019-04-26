@@ -22,7 +22,7 @@
     Top = 0
     Width = 412
     Height = 148
-    ActivePage = Treinar
+    ActivePage = Caça
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -75,10 +75,11 @@
           Height = 25
           Caption = 'Iniciar'
           TabOrder = 0
+          OnClick = btnIniciarClick
         end
         object lbdMana: TLabeledEdit
           Left = 261
-          Top = 5
+          Top = 3
           Width = 121
           Height = 23
           EditLabel.Width = 48
@@ -97,7 +98,7 @@
           TabOrder = 2
         end
         object CheckBox1: TCheckBox
-          Left = 19
+          Left = 62
           Top = 48
           Width = 121
           Height = 17
@@ -105,47 +106,75 @@
           TabOrder = 3
         end
         object CheckBox2: TCheckBox
-          Left = 261
+          Left = 243
           Top = 48
           Width = 52
           Height = 17
           Caption = 'Comer'
           TabOrder = 4
         end
-        object Combobox: TComboBox
-          Left = 315
+        object cmbHotkeyFood: TComboBox
+          Left = 296
           Top = 45
-          Width = 67
+          Width = 86
           Height = 23
           Style = csDropDownList
+          ItemIndex = 0
           TabOrder = 5
+          Text = 'Selecione'
+          OnChange = cmbHotkeyFoodChange
+          Items.Strings = (
+            'Selecione'
+            'F1'
+            'F2'
+            'F3'
+            'F4'
+            'F5'
+            'F6'
+            'F7'
+            'F8'
+            'F9'
+            'F10'
+            'F11'
+            'F12')
         end
       end
     end
     object Caça: TTabSheet
       Caption = 'Ca'#231'a'
       ImageIndex = 1
+      object Label4: TLabel
+        Left = 19
+        Top = 11
+        Width = 111
+        Height = 15
+        Caption = 'Em desenvolvimento'
+      end
     end
   end
   object castSpell: TTimer
     Enabled = False
     Interval = 700
+    OnTimer = castSpellTimer
     Left = 88
     Top = 88
   end
   object endereco: TTimer
+    OnTimer = enderecoTimer
     Left = 232
     Top = 88
   end
   object kick: TTimer
     Enabled = False
     Interval = 60000
+    OnTimer = kickTimer
     Left = 136
     Top = 88
   end
   object food: TTimer
     Enabled = False
     Interval = 30000
+    OnTimer = foodTimer
     Left = 184
     Top = 88
   end

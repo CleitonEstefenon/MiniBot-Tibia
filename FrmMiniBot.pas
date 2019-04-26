@@ -21,13 +21,20 @@ type
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     Label3: TLabel;
-    Combobox: TComboBox;
+    cmbHotkeyFood: TComboBox;
     lblManaTotal: TLabel;
     castSpell: TTimer;
     endereco: TTimer;
     kick: TTimer;
     food: TTimer;
+    Label4: TLabel;
+    procedure castSpellTimer(Sender: TObject);
+    procedure enderecoTimer(Sender: TObject);
+    procedure kickTimer(Sender: TObject);
+    procedure foodTimer(Sender: TObject);
+    procedure btnIniciarClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure cmbHotkeyFoodChange(Sender: TObject);
   private
     { Private declarations }
   public
@@ -35,14 +42,40 @@ type
   end;
 
 var
-  FrmPrincipal: TFrmPrincipal;
+    FrmPrincipal: TFrmPrincipal;
     PH : THandle;
     PID, ThID : DWORD;
     H : THandle;
-
 implementation
-
 {$R *.dfm}
+
+procedure TFrmPrincipal.FormShow(Sender: TObject);
+begin
+  CheckBox2.Enabled := False;
+end;
+
+procedure TFrmPrincipal.btnIniciarClick(Sender: TObject);
+begin
+  CastSpell.Enabled := not(CastSpell.Enabled);
+  Food.Enabled := not(Food.Enabled);
+  Kick.Enabled := not(Kick.Enabled);
+  if Checkbox1.checked then
+    Kick.Enabled := true
+  else
+    Kick.Enabled := false;
+  if Checkbox2.checked then
+    Food.Enabled := true
+  else
+    Food.Enabled := false;
+  if (lbdSpell.Text <> '') and (lbdMana.Text <> '') then
+    CastSpell.Enabled := true
+  else
+    CastSpell.Enabled := false;
+  if (Kick.Enabled) or (Food.Enabled) or (CastSpell.Enabled) then
+    btnIniciar.Caption := 'Stop'
+  else
+    btnIniciar.Caption := 'Start';
+  end;
 
 //Função para escrever na janela do tibia
 function say(mensagem: string) :string;
@@ -58,14 +91,17 @@ begin
 end;
 
 //Função para ler endereço de memoria do Tibia
-{function LerInt(Address: Integer): Integer;
-var value:integer; Ler :THandle;
+function LerInt(Address: Integer): Integer;
+var
+  value:integer;
+  ler :THandle;
 begin
-  H := FindWindow(nil, 'Calculadora');
+  H := FindWindow(nil, 'Tibia');
   ThID := GetWindowThreadProcessId(H, @PID);
+  PH := OpenProcess(PROCESS_ALL_ACCESS,FALSE,PID);
   ReadProcessMemory(PH, Ptr(Address), @Value, 4, Ler);
   Result:=value;
-end; }
+end;
 
 //Função para apertar uma determinada tecla na janela do Tibia
 function hotkey(x :string): string;
@@ -99,21 +135,47 @@ begin
   h := FindWindow(nil, 'Tibia');  // acha a janela do tibia
   SendMessage(h, WM_KEYdown, i, 0);   //pressiona a tecla
   SendMessage(h, WM_KEYUP, i, 0);  //solta tecla
-  end;
+end;
 
-
-  procedure TFrmPrincipal.FormShow(Sender: TObject);
-var Value, Address, Result :integer; Ler :THandle;
-
+// Se a mana do player for maior que a mana que foi digitada no component mana, entao vai falar a magia
+procedure TFrmPrincipal.castSpellTimer(Sender: TObject);
 begin
+  if StrToInt(lblManaTotal.Caption) > (StrToInt(lbdMana.Text)) then
+    say(lbdSpell.text);
+end;
 
+procedure TFrmPrincipal.cmbHotkeyFoodChange(Sender: TObject);
+begin
+  if cmbHotkeyFood.Text <> 'Selecione' then
+    CheckBox2.Enabled := True
+  else
+    CheckBox2.Enabled := False;
+end;
 
+// Vai ler o endereço da mana do personagem e transforma em numero para o label2
+procedure TFrmPrincipal.enderecoTimer(Sender: TObject);
+begin
+  lblManaTotal.caption := IntToStr(Lerint($0081CE5C));
+end;
 
-  H := FindWindow(nil, 'Calculadora');
-  ThID := GetWindowThreadProcessId(H, @PID);
-  ReadProcessMemory(H, Ptr(ThID), @Value, 4, Ler);
-  Result:=value;
-  ShowMessage(IntToStr(Address));
+// Pressiona oque tiver no Texto do Combobox
+procedure TFrmPrincipal.foodTimer(Sender: TObject);
+begin
+  //hotkey(cmbHotkeyFood.Text)
+  ShowMessage(cmbHotkeyFood.Text);
+end;
+
+procedure TFrmPrincipal.kickTimer(Sender: TObject);
+Var
+TibiaHandle : THandle;
+begin
+  TibiaHandle:=FindWindow(nil,'Tibia');
+  SendMessage(TibiaHandle,WM_KEYDOWN,VK_CONTROL,1);
+  SendMessage(TibiaHandle,WM_KEYDOWN,VK_UP,1);
+  SendMessage(TibiaHandle,WM_KEYUP,VK_UP,1);
+  SendMessage(TibiaHandle,WM_KEYDOWN,VK_DOWN,1);
+  SendMessage(TibiaHandle,WM_KEYUP,VK_DOWN,1);
+  SendMessage(TibiaHandle,WM_KEYUP,VK_CONTROL,1);
 end;
 
 end.
